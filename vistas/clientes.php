@@ -1,6 +1,19 @@
 <?php
+//Activamos el almacenamiento en el buffer
+ob_start();
+session_start();
+if (!isset($_SESSION["nombre"]))
+{
+  header("Location: login.php");
+}
+else
+{
 require 'header.php';
+
+if ($_SESSION['Clientes']==1)
+{
 ?>
+    <!-- Inicio Contenido PHP-->
     <div class="row">
         <div class="col-lg-12">
             <div class="main-box clearfix">
@@ -63,13 +76,19 @@ require 'header.php';
             </div>
         </div>
     </div>
+    <!-- Fin Contenido PHP-->
     <?php
-
+}
+else
+{
+ require 'noacceso.php';
+}
 
 require 'footer.php';
 ?>
         <script type="text/javascript" src="scripts/clientes.js"></script>
 <?php 
+}
 ob_end_flush();
 ?>
 

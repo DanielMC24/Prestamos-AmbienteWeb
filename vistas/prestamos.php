@@ -1,5 +1,17 @@
 <?php
+//Activamos el almacenamiento en el buffer
+ob_start();
+session_start();
+if (!isset($_SESSION["nombre"]))
+{
+  header("Location: login.php");
+}
+else
+{
 require 'header.php';
+
+if ($_SESSION['Prestamos']==1)
+{
 ?>
     <!-- Inicio Contenido PHP-->
     <div class="row">
@@ -110,10 +122,84 @@ require 'header.php';
     </div>
     <!-- Fin Contenido PHP-->
     <?php
-
+}
+else
+{
+  require 'noacceso.php';
+}
 require 'footer.php';
 ?>
-    <script type="text/javascript" src="scripts/prestamos.js"></script>
+<script>
+$(document).ready(function($){
+var mont;
+	$('#monto').keyup(function (e) {
+		mont = $(this).val();
+	 //console.log(mont)	  
+	})
+
+		$('select#interes').on('change',function(){
+		     var valor = $(this).val(); 
+			 var subt = mont * (valor/100);
+			 var total = parseFloat(subt) + parseFloat(mont);			
+			 $("#saldo").val(total);		
+		})
+
+sumaDias = function(d, fecha)
+{
+ var Fecha = new Date();
+ var sFecha = fecha || (Fecha.getDate() + "-" + (Fecha.getMonth() +1) + "-" + Fecha.getFullYear());
+ var sep = sFecha.indexOf('-') != -1 ? '-' : '-';
+ var aFecha = sFecha.split(sep);
+ var fecha = aFecha[2]+'-'+aFecha[1]+'-'+aFecha[0];
+ fecha= new Date(fecha);
+ fecha.setDate(fecha.getDate()+parseInt(d));
+ var anno=fecha.getFullYear();
+ var mes= fecha.getMonth()+1;
+ var dia= fecha.getDate();
+ mes = (mes < 10) ? ("0" + mes) : mes;
+ dia = (dia < 10) ? ("0" + dia) : dia;
+ var fechaFinal = dia+sep+mes+sep+anno;
+ return (fechaFinal);
+ }
+
+ $('select#formapago').on('change',function(){
+		     var valor = $(this).val(); 
+			 if(valor == 'Diario'){
+			 	$('#fechapago').val(sumaDias(1));
+			 }
+				 if(valor == 'Semanal'){
+				 	$('#fechapago').val(sumaDias(7));
+				 }
+					 if(valor == 'Quincenal'){
+					 	$('#fechapago').val(sumaDias(15));
+					 }
+						 if(valor == 'Mensual'){
+						 	$('#fechapago').val(sumaDias(30));
+						 }
+		})
+
+  $('select#plazo').on('change',function(){
+		     var valor = $(this).val(); 
+			 if(valor == 'Dia'){
+			 	$('#fplazo').val(sumaDias(1));
+			 }
+				 if(valor == 'Semana'){
+				 	$('#fplazo').val(sumaDias(7));
+				 }
+					 if(valor == 'Quincena'){
+					 	$('#fplazo').val(sumaDias(15));
+					 }
+						 if(valor == 'Mes'){
+						 	$('#fplazo').val(sumaDias(30));
+						 }
+		})
+})
+</script>
+<script type="text/javascript" src="scripts/prestamos.js"></script>
+<!--<script type="text/javascript" src="scripts/prestamos.js?v=<?php echo str_replace('.', '', microtime(true)); ?>"></script>-->
+
 <?php 
+}
 ob_end_flush();
 ?>
+
