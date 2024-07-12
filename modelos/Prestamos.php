@@ -69,11 +69,32 @@ Class Prestamo
 		return ejecutarConsulta($sql);		
 	}
     
+
     public function select()
 	{
-		$sql="SELECT p.idprestamo,c.nombre FROM prestamos p INNER JOIN clientes c ON p.idcliente=c.idcliente WHERE p.estado=1 ORDER BY c.nombre ASC";
+		$sql="SELECT distinct c.cedula, c.idcliente FROM prestamos p INNER JOIN clientes c ON p.idcliente=c.idcliente WHERE p.estado=1";
 		return ejecutarConsulta($sql);		
 	}
+
+    public function selectPrestamosID($idcliente)
+	{
+		$sql="SELECT monto, idprestamo FROM prestamos WHERE idcliente = ".$idcliente." and estado=1";
+		return ejecutarConsulta($sql);		
+	}
+
+    public function traerSaldo($idprestamo)
+    {
+        $sql="SELECT saldo FROM prestamos WHERE idprestamo = ".$idprestamo."";
+        return ejecutarConsulta($sql);
+    }
+
+    public function actualizarSaldo($idprestamo, $saldo1)
+    {
+        $sql="UPDATE prestamos SET 
+                     saldo='$saldo1'
+                    WHERE idprestamo='$idprestamo'";
+        return ejecutarConsulta($sql);
+    }
 
 }
 

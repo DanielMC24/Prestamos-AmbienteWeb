@@ -47,6 +47,14 @@ if ($_SESSION['Pagos']==1)
                         <select id="idprestamo" name="idprestamo" class="form-control selectpicker" data-live-search="true" required></select>
                         </div>
                         </div>
+
+                        <div class="row">
+                        <div class="form-group col-sm-5 col-xs-12">
+                            <label>Cuenta</label>
+                            <input type="hidden" name="idpago" id="idpago">
+                        <select id="idprestamo2" name="idprestamo2" class="form-control selectpicker" data-live-search="true" required></select>
+                        </div>
+                        </div>
                         
                         <div class="row">
                               <div class="form-group col-sm-5 col-xs-12">

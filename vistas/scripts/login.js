@@ -19,5 +19,3 @@ $("#frmAcceso").on("submit",function(e)
         }
     });
 })
-
-console.log("entro")
