@@ -44,5 +44,20 @@ if (!function_exists('ejecutarConsulta'))
 		$str = mysqli_real_escape_string($conexion,trim($str));
 		return htmlspecialchars($str);
 	}
+
+	
+function AbrirBD()
+{
+        return mysqli_connect('127.0.0.1:3309','root','','prestamos');
+
+}
+	
+function CerrarBD($Connection)
+{
+
+    /// Cerrar la base de datos///
+        mysqli_close($Connection);
+}
+
 }
 ?>

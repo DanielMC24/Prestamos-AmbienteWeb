@@ -16,16 +16,6 @@ var tabla;
             });
         }
 
-      
-        $('#idprestamo').on('change',function(){
-            var cedula = $(this).val();
-            $("#idprestamo2").empty();
-            $.post("../ajax/pagos.php?op=selectCuenta", {idprestamo: cedula}, function(r){
-                $("#idprestamo2").append(r);
-                $('#idprestamo2').selectpicker('refresh');
-            });
-           //console.log(cedula)
-        });
         //Funcion Limpiar
         function limpiar() {
             $("#idpago").val("");

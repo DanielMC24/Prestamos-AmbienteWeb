@@ -25,7 +25,7 @@ switch ($_GET["op"]){
 		}
 		else {
 			$rspta=$prestamo->editar($idprestamo,$idcliente,$usuario,$fprestamo,$monto,$interes,$saldo,$formapago,$fechapago,$plazo,$fplazo);
-			echo $rspta ? "Prestamo actualizado" : "Prestamo no se pudo actualizar";
+			echo $rspta ? "Prestamo actualizada" : "Prestamo no se pudo actualizar";
 		}
 	break;
         

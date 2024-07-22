@@ -97,7 +97,19 @@ if (strlen(session_id()) < 1)
 </div>
 <div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav">
 <ul class="nav nav-pills nav-stacked">
-      
+       
+       <?php 
+            if ($_SESSION['Escritorio']==1)
+            {
+              echo '<li>
+        <a href="concepto.php">
+        <i class="fa fa-dashboard"></i>
+        <span>Escritorio</span>
+        </a>
+        </li>';
+            }
+            ?>
+        
          <?php 
             if ($_SESSION['Clientes']==1)
             {
@@ -154,7 +166,37 @@ if (strlen(session_id()) < 1)
 <span>Gastos</span>
 </a>
 </li>';
-            }?>
+            }
+            ?>
+                <?php 
+            if ($_SESSION['Consultas']==1)
+            {
+              echo '<li>
+<a href="#" class="dropdown-toggle">
+<i class="fa fa-bar-chart-o"></i>
+<span>Consultas</span>
+<i class="fa fa-angle-right drop-icon"></i>
+</a>
+<ul class="submenu">
+<li>
+<a href="#">
+Consulta de Prestamos
+</a>
+</li>
+<li>
+<a href="#">
+Consulta de Pagos
+</a>
+</li>
+<li>
+<a href="#">
+Consulta diarias
+</a>
+</li>
+</ul>
+</li>';
+            }
+            ?>
 </ul>
 </div>
 </div>
