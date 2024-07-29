@@ -1,61 +1,133 @@
-<?php 
-//Incluimos inicialmente la conexion a la base de datos
+<?php
 require "../config/Conexion.php";
-    
+
 Class Gastos
 {
-    //implementamos nuestro constructor
+    // Constructor
     public function __construct()
     {   
     }
-    
-    //implementamos un metodo para insertar registros
-    public function insertar($idusuario,$fecha,$concepto,$gasto)
+
+    // Método para insertar registros
+    public function insertar($idusuario, $fecha, $concepto, $gasto)
     {
-        $sql="INSERT INTO gastos (idusuario,fecha,concepto,gasto)
-		                  VALUES ('$idusuario','$fecha','$concepto','$gasto')";
-		return ejecutarConsulta($sql);
+        global $conexion;
+        $sql = "CALL insertar_gasto(?, ?, ?, ?)";
+        
+        // Preparar la consulta
+        if ($stmt = $conexion->prepare($sql)) {
+            // Enlazar parámetros
+            $stmt->bind_param('issd', $idusuario, $fecha, $concepto, $gasto);
+            
+            // Ejecutar la consulta
+            if ($stmt->execute()) {
+                $stmt->close();
+                return true;
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return false;
+    }
+
+    // Método para editar registros
+    public function editar($idgasto, $idusuario, $fecha, $concepto, $gasto)
+    {
+        global $conexion;
+        $sql = "CALL editar_gasto(?, ?, ?, ?, ?)";
+        
+        // Preparar la consulta
+        if ($stmt = $conexion->prepare($sql)) {
+            // Enlazar parámetros
+            $stmt->bind_param('iissd', $idgasto, $idusuario, $fecha, $concepto, $gasto);
+            
+            // Ejecutar la consulta
+            if ($stmt->execute()) {
+                $stmt->close();
+                return true;
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return false;
+    }
+
+    // Método para eliminar registros
+    public function eliminar($idgasto)
+    {
+        global $conexion;
+        $sql = "CALL eliminar_gasto(?)";
+        
+        // Preparar la consulta
+        if ($stmt = $conexion->prepare($sql)) {
+            // Enlazar parámetros
+            $stmt->bind_param('i', $idgasto);
+            
+            // Ejecutar la consulta
+            if ($stmt->execute()) {
+                $stmt->close();
+                return true;
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return false;
+    }
+
+    // Método para mostrar los datos de un registro
+    public function mostrar($idgasto)
+    {
+        global $conexion;
+        $sql = "CALL mostrar_gasto(?)";
+        
+        // Preparar la consulta
+        if ($stmt = $conexion->prepare($sql)) {
+            // Enlazar parámetros
+            $stmt->bind_param('i', $idgasto);
+            
+            // Ejecutar la consulta
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+                $row = $result->fetch_assoc();
+                $stmt->close();
+                return $row;
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return null;
+    }
+    // Método para listar todos los registros
+public function listar()
+{
+    global $conexion;
+    $sql = "CALL listar_gastos()";
+    
+    // Preparar la consulta
+    if ($stmt = $conexion->prepare($sql)) {
+        // Ejecutar la consulta
+        if ($stmt->execute()) {
+            return $stmt->get_result(); // Devuelve el objeto de resultado
+        } else {
+            echo "Error en la ejecución: " . $stmt->error;
+        }
+    } else {
+        echo "Error en la preparación: " . $conexion->error;
     }
     
-    //Implementamos el metodo para Editar Registros
-    public function editar($idgasto,$idusuario,$fecha,$concepto,$gasto)
-	{
-		$sql="UPDATE gastos SET idusuario='$idusuario',
-                                fecha='$fecha',
-                                concepto='$concepto',
-                                gasto='$gasto' 
-                                WHERE idgasto='$idgasto'";
-		return ejecutarConsulta($sql);
-	}
-    
-    //implementamos el metodo eliminar
-    public function eliminar($idgasto)
-	{
-		$sql="DELETE FROM gastos WHERE idgasto='$idgasto'";
-		return ejecutarConsulta($sql);
-	}
-    
-    //Implementar un método para mostrar los datos de un registro a modificar
-	public function mostrar($idgasto)
-	{
-		$sql="SELECT * FROM gastos WHERE idgasto='$idgasto'";
-		return ejecutarConsultaSimpleFila($sql);
-	}
-    
-//mostrar lista de la tabla gastos    
-    public function listar()
-	{
-		$sql="SELECT g.idgasto,
-                    g.idusuario,
-                    u.nombre as Usuario, 
-                    g.fecha,
-                    g.concepto,
-                    g.gasto 
-                    FROM gastos g INNER JOIN usuarios u 
-                    ON g.idusuario=u.idusuario";
-		return ejecutarConsulta($sql);		
-	}
-
+    return null; // Si hubo un error, retorna null
 }
-
+}
 ?>

@@ -1,101 +1,232 @@
-<?php 
-//Incluimos inicialmente la conexion a la base de datos
+<?php
 require "../config/Conexion.php";
-    
-Class Prestamo
+
+class Prestamo
 {
-    //implementamos nuestro constructor
+    // Constructor
     public function __construct()
-    {   
-    }
-    
-    //implementamos un metodo para insertar registros
-    public function insertar($idcliente,$usuario,$fprestamo,$monto,$interes,$saldo,$formapago,$fechapago,$plazo,$fplazo)
     {
-        $sql="INSERT INTO prestamos (idcliente,usuario,fprestamo,monto,interes,saldo,formapago,fpago,plazo,fplazo,estado) 
-        VALUES ('$idcliente','$usuario','$fprestamo','$monto','$interes','$saldo','$formapago','$fechapago','$plazo','$fplazo','1')";
-        return ejecutarConsulta($sql);
+    }
+
+    // Método para insertar registros
+    public function insertar($idcliente, $usuario, $fprestamo, $monto, $interes, $saldo, $formapago, $fechapago, $plazo, $fplazo)
+    {
+        global $conexion;
+        $sql = "CALL insertar_prestamo(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        if ($stmt = $conexion->prepare($sql)) {
+            $stmt->bind_param('iissdsssss', $idcliente, $usuario, $fprestamo, $monto, $interes, $saldo, $formapago, $fechapago, $plazo, $fplazo);
+            
+            if ($stmt->execute()) {
+                $stmt->close();
+                return true;
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return false;
     }
     
-    //Implementamos el metodo para Editar Registros
-    public function editar($idprestamo,$idcliente,$usuario,$fprestamo,$monto,$interes,$saldo,$formapago,$fechapago,$plazo,$fplazo)
-	{
-		$sql="UPDATE prestamos SET 
-                     idcliente='$idcliente',
-                     usuario='$usuario',
-                     fprestamo='$fprestamo',
-                     monto='$monto',
-                     interes='$interes',  
-                     saldo='$saldo',
-                     formapago='$formapago',
-                     fpago='$fechapago',
-                     plazo='$plazo',
-                     fplazo='$fplazo' 
-                    WHERE idprestamo='$idprestamo'";
-		return ejecutarConsulta($sql);
-	}
-    
-    //Implementamos un método para eliminar categorías
-	public function eliminar($idprestamo)
-	{
-		$sql="DELETE FROM prestamos WHERE idprestamo='$idprestamo'";
-		return ejecutarConsulta($sql);
-	}
-    
-    //Implementamos un método para desactivar Clientes
-	public function cancelado($idprestamo)
-	{
-		$sql="UPDATE prestamos SET estado ='0' WHERE SaldoActual=0";
-		return ejecutarConsulta($sql);
-	} 
-    
-    //Implementar un método para mostrar los datos de un registro a modificar
-	public function mostrar($idprestamo)
-	{
-		$sql="SELECT p.idprestamo,c.nombre as cliente,u.nombre as usuario,DATE(p.fprestamo) as fecha,p.monto,p.interes,p.saldo,p.formapago,DATE(p.fpago) as fechap,p.plazo,DATE(p.fplazo) as fechaf,p.estado 
-        FROM prestamos p INNER JOIN clientes c ON 
-        p.idcliente=c.idcliente INNER JOIN usuarios u ON 
-        p.usuario=u.idusuario";
-		return ejecutarConsultaSimpleFila($sql);
-	}
-    
-//mostrar lista de la tabla gastos    
+
+    // Método para editar registros
+    public function editar($idprestamo, $idcliente, $usuario, $fprestamo, $monto, $interes, $saldo, $formapago, $fechapago, $plazo, $fplazo)
+    {
+        global $conexion;
+        $sql = "CALL editar_prestamo(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        if ($stmt = $conexion->prepare($sql)) {
+            $stmt->bind_param('iiissdsssss', $idprestamo, $idcliente, $usuario, $fprestamo, $monto, $interes, $saldo, $formapago, $fechapago, $plazo, $fplazo);
+            
+            if ($stmt->execute()) {
+                $stmt->close();
+                return true;
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return false;
+    }
+
+    // Método para eliminar registros
+    public function eliminar($idprestamo)
+    {
+        global $conexion;
+        $sql = "CALL eliminar_prestamo(?)";
+        
+        if ($stmt = $conexion->prepare($sql)) {
+            $stmt->bind_param('i', $idprestamo);
+            
+            if ($stmt->execute()) {
+                $stmt->close();
+                return true;
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return false;
+    }
+
+    // Método para cancelar registros
+    public function cancelado($idprestamo)
+    {
+        global $conexion;
+        $sql = "CALL sp_cancelar_prestamo(?)";
+        
+        if ($stmt = $conexion->prepare($sql)) {
+            $stmt->bind_param('i', $idprestamo);
+            
+            if ($stmt->execute()) {
+                $stmt->close();
+                return true;
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return false;
+    }
+
+    // Método para mostrar los datos de un registro
+    public function mostrar($idprestamo)
+    {
+        global $conexion;
+        $sql = "CALL mostrar_prestamo(?)";
+        
+        if ($stmt = $conexion->prepare($sql)) {
+            $stmt->bind_param('i', $idprestamo);
+            
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+                $row = $result->fetch_assoc();
+                $stmt->close();
+                return $row;
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return null;
+    }
+
+    // Método para listar todos los registros
     public function listar()
-	{
-		$sql="SELECT p.idprestamo,c.nombre as cliente,u.nombre as usuario,DATE(p.fprestamo) as fecha,p.monto,p.interes,p.saldo,p.formapago,DATE(p.fpago) as fechap,p.plazo,DATE(p.fplazo) as fechaf,p.estado 
-        FROM prestamos p INNER JOIN clientes c ON 
-        p.idcliente=c.idcliente INNER JOIN usuarios u ON 
-        p.usuario=u.idusuario";
-		return ejecutarConsulta($sql);		
-	}
-    
+    {
+        global $conexion;
+        $sql = "CALL listar_prestamos()";
+        
+        if ($stmt = $conexion->prepare($sql)) {
+            if ($stmt->execute()) {
+                return $stmt->get_result(); // Devuelve el objeto de resultado
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return null; // Si hubo un error, retorna null
+    }
 
+    // Método para seleccionar clientes activos
     public function select()
-	{
-		$sql="SELECT distinct c.cedula, c.idcliente FROM prestamos p INNER JOIN clientes c ON p.idcliente=c.idcliente WHERE p.estado=1";
-		return ejecutarConsulta($sql);		
-	}
+    {
+        global $conexion;
+        $sql = "CALL select_clientes_activos()";
+        
+        if ($stmt = $conexion->prepare($sql)) {
+            if ($stmt->execute()) {
+                return $stmt->get_result(); // Devuelve el objeto de resultado
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return null; // Si hubo un error, retorna null
+    }
 
+    // Método para seleccionar préstamos por cliente
     public function selectPrestamosID($idcliente)
-	{
-		$sql="SELECT monto, idprestamo FROM prestamos WHERE idcliente = ".$idcliente." and estado=1";
-		return ejecutarConsulta($sql);		
-	}
-
+    {
+        global $conexion;
+        $sql = "CALL select_prestamos_por_cliente(?)";
+        
+        if ($stmt = $conexion->prepare($sql)) {
+            $stmt->bind_param('i', $idcliente);
+            
+            if ($stmt->execute()) {
+                return $stmt->get_result(); // Devuelve el objeto de resultado
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return null; // Si hubo un error, retorna null
+    }
     public function traerSaldo($idprestamo)
     {
-        $sql="SELECT saldo FROM prestamos WHERE idprestamo = ".$idprestamo."";
-        return ejecutarConsulta($sql);
+        global $conexion;
+        $sql = "CALL traer_saldo(?)";
+        
+        if ($stmt = $conexion->prepare($sql)) {
+            $stmt->bind_param('i', $idprestamo);
+            
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+                if ($result->num_rows > 0) {
+                    $row = $result->fetch_object(); // Usa fetch_object() en lugar de fetch_assoc()
+                    $stmt->close();
+                    return $row;
+                } else {
+                    echo "No se encontraron resultados.";
+                }
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return null;
     }
+    
 
-    public function actualizarSaldo($idprestamo, $saldo1)
+    // Método para actualizar saldo
+    public function actualizarSaldo($idprestamo, $saldo)
     {
-        $sql="UPDATE prestamos SET 
-                     saldo='$saldo1'
-                    WHERE idprestamo='$idprestamo'";
-        return ejecutarConsulta($sql);
+        global $conexion;
+        $sql = "CALL actualizar_saldo(?, ?)";
+        
+        if ($stmt = $conexion->prepare($sql)) {
+            $stmt->bind_param('id', $idprestamo, $saldo);
+            
+            if ($stmt->execute()) {
+                $stmt->close();
+                return true;
+            } else {
+                echo "Error en la ejecución: " . $stmt->error;
+            }
+        } else {
+            echo "Error en la preparación: " . $conexion->error;
+        }
+        
+        return false;
     }
-
 }
-
 ?>
