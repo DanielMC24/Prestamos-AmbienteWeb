@@ -32,24 +32,29 @@
     </div>
 </header>
 <div id="login-box-inner">
+
+    <?php
+        if(isset($_POST["msj"]))
+        {
+            echo '<div class="alert alert-info TextoCentrado">' . $_POST["msj"] . '</div>';
+        }
+    ?>
     <form id="frmAcceso" method="post">
     <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-user"></i></span>
-        <input class="form-control" type="text" id="logina" name="logina" placeholder="Usuario">
+        <input id="txtIdentificacion" name="txtIdentificacion" type="text" class="form-control"
+        placeholder="Identificación" required>
     </div>
-    <div class="input-group">
-        <span class="input-group-addon"><i class="fa fa-key"></i></span>
-        <input type="password" class="form-control" id="clavea" name="clavea" placeholder="Password">
-    </div>
+
     <div class="row">
         <div class="col-xs-12">
-        <button id="btnIniciarSesion" type="submit" class="btn btn-success col-xs-12">Ingresar</button>
+        <button type="submit" id="btnRecuperarAcceso" name="btnRecuperarAcceso" class="btn btn-success col-xs-12">Procesar</button>
         </div>
     </div>
     </form>
     <br>
-    <p>
-        <a href="recuperar.php">Olvidaste tu contraseña?</a>
+    <p class="mb-1">
+        <a href="login.php" class="text-center">Ya tienes una cuenta?</a>
     </p>
 
 </div>
