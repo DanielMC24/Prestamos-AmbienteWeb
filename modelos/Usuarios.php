@@ -109,6 +109,8 @@ Class Usuarios
 		$sql="SELECT * FROM usuarios WHERE estado=1 ORDER BY nombre DESC";
 		return ejecutarConsulta($sql);		
 	}
+
+	
 }
 
 ?>

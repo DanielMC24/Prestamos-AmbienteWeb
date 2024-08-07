@@ -2,75 +2,6 @@
 session_start(); 
 require_once "../modelos/Usuarios.php";
 
-/*if(isset($_POST["btnIniciarSesion"]))
-    {
-        $usuarios=new Usuarios();
-
-$idusuario=isset($_POST["idusuario"])? limpiarCadena($_POST["idusuario"]):"";
-$nombre=isset($_POST["nombre"])? limpiarCadena($_POST["nombre"]):"";
-$direccion=isset($_POST["direccion"])? limpiarCadena($_POST["direccion"]):"";
-$telefono=isset($_POST["telefono"])? limpiarCadena($_POST["telefono"]):"";
-$logina=isset($_POST["logina"])? limpiarCadena($_POST["logina"]):"";
-$clavea=isset($_POST["clavea"])? limpiarCadena($_POST["clavea"]):"";
-$imagen=isset($_POST["imagen"])? limpiarCadena($_POST["imagen"]):"";
-
-        $respuesta = IniciarSesion($Email,$Password);
-
-        if($respuesta -> num_rows > 0)
-        {
-            $datos = mysqli_fetch_array($respuesta);
-            $_SESSION["NombreUsuario"] = $datos["Nombre"];
-            header("location: ../View/home.php");
-        }
-        else
-        {
-            $_POST["msj"] = "Su información no se ha validado correctamente.";
-        }
-		$logina=$_POST['logina'];
-	    $clavea=$_POST['clavea'];
-
-	    //Hash SHA256 en la contraseña
-		$clavehash=hash("SHA256",$clavea);
-
-		$rspta=$usuarios->verificar($logina, $clavehash);
-
-		$fetch=$rspta->fetch_object();
-
-		if (isset($fetch))
-	    {
-	        //Declaramos las variables de sesión
-	        $_SESSION['idusuario']=$fetch->idusuario;
-	        $_SESSION['nombre']=$fetch->nombre;
-	        $_SESSION['imagen']=$fetch->imagen;
-	        $_SESSION['login']=$fetch->login;
-
-	        //Obtenemos los permisos del usuario
-	    	$marcados = $usuarios->listarmarcados($fetch->idusuario);
-
-	    	//Declaramos el array para almacenar todos los permisos marcados
-			$valores=array();
-
-			//Almacenamos los permisos marcados en el array
-			while ($per = $marcados->fetch_object())
-				{
-					array_push($valores, $per->idpermiso);
-				}
-
-			//Determinamos los accesos del usuario
-			in_array(1,$valores)?$_SESSION['Escritorio']=1:$_SESSION['Escritorio']=0;
-			in_array(2,$valores)?$_SESSION['Clientes']=1:$_SESSION['Clientes']=0;
-			in_array(3,$valores)?$_SESSION['Prestamos']=1:$_SESSION['Prestamos']=0;
-			in_array(4,$valores)?$_SESSION['Pagos']=1:$_SESSION['Pagos']=0;
-			in_array(5,$valores)?$_SESSION['Usuarios']=1:$_SESSION['Usuarios']=0;
-			in_array(6,$valores)?$_SESSION['Gastos']=1:$_SESSION['Gastos']=0;
-			in_array(7,$valores)?$_SESSION['Consultas']=1:$_SESSION['Consultas']=0;
-
-	    }
-	    echo json_encode($fetch);
-		echo "<script>console.log('controller');</script>";
-    }*/
-
-
 $usuarios=new Usuarios();
 
 $idusuario=isset($_POST["idusuario"])? limpiarCadena($_POST["idusuario"]):"";
@@ -235,5 +166,39 @@ case 'listar':
         header("Location: ../index.php");
 
 	break;
+}
+
+if(isset($_POST["btnRecuperarAcceso"]))
+{
+	$Identificacion = $_POST["txtIdentificacion"];
+	$respuesta = ConsultarUsuarioXIdentificacion($idusuario);
+
+	if($respuesta -> num_rows > 0)
+	{
+		$datos = mysqli_fetch_array($respuesta);
+		$codigo = GenerarCodigo();
+		$resp = ActualizarContrasenna($datos["Consecutivo"],$codigo,true);
+
+		if($resp == true)
+		{
+			$contenido = "<html><body>
+			Estimado(a) " . $datos["Nombre"] . "<br/><br/>
+			Se ha generado el siguiente código de seguridad: <b>" . $codigo . "</b><br/>
+			Recuerde realizar el cambio de contraseña una vez que ingrese a nuestro sistema<br/><br/>
+			Muchas gracias.
+			</body></html>";
+
+			EnviarCorreo('Acceso al Sistema', $contenido, $datos["Correo"]);
+			header("location: ../View/login.php");
+		}
+		else
+		{
+			$_POST["msj"] = "No se ha podido enviar su código de seguridad correctamente.";
+		}
+	}
+	else
+	{
+		$_POST["msj"] = "Su información no se ha validado correctamente.";
+	}
 }
 ?>
